@@ -66,6 +66,13 @@ dataset_train = dataset_raw["train"].map(
     desc="Tokenizando train"
 )
 
+dataset_val = dataset_raw["validation"].map(
+    tokenize_and_truncate,
+    batched=True,
+    remove_columns=cols_a_borrar,
+    desc="Tokenizando validación"
+)
+
 print("\n[3] Configurando adaptadores LoRA de bajo rango...")
 lora_config = LoraConfig(
     r=8,
@@ -81,12 +88,17 @@ args_entrenamiento = SFTConfig(
     output_dir="./resultados_ragtruth",
     per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
-    num_train_epochs=1,
+    num_train_epochs=3,
     learning_rate=2e-4,
     fp16=False,
     bf16=True,
     logging_steps=5,
-    eval_strategy="no",
+    eval_strategy="steps",
+    eval_steps=200,
+    save_strategy="steps",
+    save_steps=200,
+    load_best_model_at_end=True,
+    metric_for_best_model="eval_loss",
     optim="paged_adamw_8bit",
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
@@ -97,7 +109,8 @@ args_entrenamiento = SFTConfig(
 
 trainer = SFTTrainer(
     model=model,
-    train_dataset=dataset_train,   # dataset ya tokenizado, sin campo "text"
+    train_dataset=dataset_train,
+    eval_dataset=dataset_val,
     peft_config=lora_config,
     args=args_entrenamiento,
 )
