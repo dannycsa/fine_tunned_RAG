@@ -1,0 +1,30 @@
+{
+  "system": "cloud:amazon.nova-micro-v1:0",
+  "detection": {
+    "n": 200,
+    "accuracy": 0.63,
+    "halluc_precision": 0.6083333333333333,
+    "halluc_recall": 0.73,
+    "halluc_f1": 0.6636363636363636,
+    "faithful_precision": 0.6625,
+    "faithful_recall": 0.53,
+    "faithful_f1": 0.588888888888889,
+    "macro_precision": 0.6354166666666666,
+    "macro_recall": 0.63,
+    "macro_f1": 0.6262626262626263,
+    "confusion": {
+      "tp": 73,
+      "fp": 47,
+      "fn": 27,
+      "tn": 53
+    }
+  },
+  "efficiency": {
+    "latency_ms_median": 1826.35,
+    "latency_ms_mean": 2132.608,
+    "total_input_tokens": 144451,
+    "total_output_tokens": 11703,
+    "total_tokens": 156154,
+    "avg_tokens_per_instance": 780.77
+  }
+}

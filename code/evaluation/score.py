@@ -57,17 +57,27 @@ def detection_metrics(rows):
 
 
 # ----------------------- Eficiencia: latencia / tokens ---------------------
-def efficiency_metrics(rows):
+# Precios on-demand Bedrock por 1.000 tokens (us-east-1, feb 2026). El sistema
+# LOCAL no tiene costo de API -> usar --price-in 0 --price-out 0 (costo = $0.00).
+PRICE_IN_NOVA_MICRO = 0.000035   # USD / 1k tokens entrada
+PRICE_OUT_NOVA_MICRO = 0.00014   # USD / 1k tokens salida
+
+
+def efficiency_metrics(rows, price_in, price_out):
     lat = [r["latency_ms"] for r in rows if r.get("latency_ms") is not None]
-    tin = [r.get("input_tokens") or 0 for r in rows]
-    tout = [r.get("output_tokens") or 0 for r in rows]
+    tin = sum(r.get("input_tokens") or 0 for r in rows)
+    tout = sum(r.get("output_tokens") or 0 for r in rows)
+    n = len(rows)
+    cost_total = (tin / 1000) * price_in + (tout / 1000) * price_out
     return {
         "latency_ms_median": statistics.median(lat) if lat else None,
         "latency_ms_mean": statistics.mean(lat) if lat else None,
-        "total_input_tokens": sum(tin),
-        "total_output_tokens": sum(tout),
-        "total_tokens": sum(tin) + sum(tout),
-        "avg_tokens_per_instance": (sum(tin) + sum(tout)) / len(rows) if rows else 0,
+        "total_input_tokens": tin,
+        "total_output_tokens": tout,
+        "total_tokens": tin + tout,
+        "avg_tokens_per_instance": (tin + tout) / n if n else 0,
+        "cost_total_usd": round(cost_total, 6),
+        "cost_per_1k_evals_usd": round((cost_total / n) * 1000, 4) if n else 0,
     }
 
 
@@ -114,6 +124,10 @@ def main():
     ap.add_argument("--preds", required=True)
     ap.add_argument("--no-ragas", action="store_true")
     ap.add_argument("--max-ragas", type=int, default=0, help="0 = todas")
+    ap.add_argument("--price-in", type=float, default=PRICE_IN_NOVA_MICRO,
+                    help="USD/1k tokens entrada (0 para local)")
+    ap.add_argument("--price-out", type=float, default=PRICE_OUT_NOVA_MICRO,
+                    help="USD/1k tokens salida (0 para local)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
@@ -122,7 +136,7 @@ def main():
 
     results = {"system": rows[0].get("system"),
                "detection": detection_metrics(rows),
-               "efficiency": efficiency_metrics(rows)}
+               "efficiency": efficiency_metrics(rows, args.price_in, args.price_out)}
 
     print("\n===== DETECCIÓN (P/R/F1) =====")
     d = results["detection"]
@@ -135,6 +149,7 @@ def main():
     e = results["efficiency"]
     print(f"  Latencia mediana   : {e['latency_ms_median']} ms")
     print(f"  Tokens totales     : {e['total_tokens']} (in={e['total_input_tokens']}, out={e['total_output_tokens']})")
+    print(f"  Costo total        : ${e['cost_total_usd']}  |  Costo/1k evals: ${e['cost_per_1k_evals_usd']}")
 
     if not args.no_ragas:
         print("\n===== RAGAS (faithfulness + answer relevancy) — usando Claude juez... =====")
