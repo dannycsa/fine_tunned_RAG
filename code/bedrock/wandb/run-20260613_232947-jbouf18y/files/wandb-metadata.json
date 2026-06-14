@@ -1,0 +1,40 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "python": "CPython 3.12.3",
+  "startedAt": "2026-06-14T03:29:47.507971Z",
+  "program": "C:\\Users\\afar1\\OneDrive\\Escritorio\\fine_tunned_RAG\\code\\bedrock\\push_to_wandb.py",
+  "codePath": "code\\bedrock\\push_to_wandb.py",
+  "codePathLocal": "push_to_wandb.py",
+  "git": {
+    "remote": "https://github.com/dannycsa/fine_tunned_RAG.git",
+    "commit": "07e1fd117ad9b3641c0914b06b00fe0ddc570e94"
+  },
+  "email": "arviziosoft@gmail.com",
+  "root": "C:\\Users\\afar1\\OneDrive\\Escritorio\\fine_tunned_RAG\\code\\bedrock",
+  "host": "FerFisX",
+  "executable": "C:\\Users\\afar1\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "cpu_count": 12,
+  "cpu_count_logical": 24,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "996969615360",
+      "used": "433248235520"
+    }
+  },
+  "memory": {
+    "total": "16334774272"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memoryTotal": "8585740288",
+      "cudaCores": 3072,
+      "architecture": "Ada",
+      "uuid": "GPU-3eb31cf6-8b6c-05cb-a097-d21c99921547"
+    }
+  ],
+  "cudaVersion": "12.5",
+  "writerId": "p117g6jim0b6387dggjf5jgdnb507hip"
+}

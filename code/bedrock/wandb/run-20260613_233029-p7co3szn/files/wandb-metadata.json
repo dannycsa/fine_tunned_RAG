@@ -1,0 +1,21 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "python": "CPython 3.12.3",
+  "startedAt": "2026-06-14T03:30:29.991840Z",
+  "args": [
+    "--name",
+    "bedrock-nova-micro-400x2-fix"
+  ],
+  "program": "C:\\Users\\afar1\\OneDrive\\Escritorio\\fine_tunned_RAG\\code\\bedrock\\push_to_wandb.py",
+  "codePath": "code\\bedrock\\push_to_wandb.py",
+  "codePathLocal": "push_to_wandb.py",
+  "git": {
+    "remote": "https://github.com/dannycsa/fine_tunned_RAG.git",
+    "commit": "07e1fd117ad9b3641c0914b06b00fe0ddc570e94"
+  },
+  "email": "arviziosoft@gmail.com",
+  "root": "C:\\Users\\afar1\\OneDrive\\Escritorio\\fine_tunned_RAG\\code\\bedrock",
+  "host": "FerFisX",
+  "executable": "C:\\Users\\afar1\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "writerId": "9vmmi8elb3nen4vfioz4bfd7pdaw9beh"
+}

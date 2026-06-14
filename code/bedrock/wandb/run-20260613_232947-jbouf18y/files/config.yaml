@@ -1,0 +1,56 @@
+_wandb:
+    value:
+        cli_version: 0.27.2
+        e:
+            p117g6jim0b6387dggjf5jgdnb507hip:
+                codePath: code\bedrock\push_to_wandb.py
+                codePathLocal: push_to_wandb.py
+                cpu_count: 12
+                cpu_count_logical: 24
+                cudaVersion: "12.5"
+                disk:
+                    /:
+                        total: "996969615360"
+                        used: "433248235520"
+                email: arviziosoft@gmail.com
+                executable: C:\Users\afar1\AppData\Local\Programs\Python\Python312\python.exe
+                git:
+                    commit: 07e1fd117ad9b3641c0914b06b00fe0ddc570e94
+                    remote: https://github.com/dannycsa/fine_tunned_RAG.git
+                gpu: NVIDIA GeForce RTX 4060 Laptop GPU
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 3072
+                      memoryTotal: "8585740288"
+                      name: NVIDIA GeForce RTX 4060 Laptop GPU
+                      uuid: GPU-3eb31cf6-8b6c-05cb-a097-d21c99921547
+                host: FerFisX
+                memory:
+                    total: "16334774272"
+                os: Windows-11-10.0.26200-SP0
+                program: C:\Users\afar1\OneDrive\Escritorio\fine_tunned_RAG\code\bedrock\push_to_wandb.py
+                python: CPython 3.12.3
+                root: C:\Users\afar1\OneDrive\Escritorio\fine_tunned_RAG\code\bedrock
+                startedAt: "2026-06-14T03:29:47.507971Z"
+                writerId: p117g6jim0b6387dggjf5jgdnb507hip
+        m: []
+        python_version: 3.12.3
+        t:
+            "3":
+                - 2
+                - 13
+                - 16
+                - 61
+            "4": 3.12.3
+            "5": 0.27.2
+            "8":
+                - 3
+            "12": 0.27.2
+            "13": windows-amd64
+base_model:
+    value: amazon.nova-micro-v1:0:128k
+epochs:
+    value: 3
+platform:
+    value: aws-bedrock
