@@ -1,0 +1,62 @@
+_wandb:
+    value:
+        cli_version: 0.27.2
+        e:
+            9vmmi8elb3nen4vfioz4bfd7pdaw9beh:
+                args:
+                    - --name
+                    - bedrock-nova-micro-400x2-fix
+                codePath: code\bedrock\push_to_wandb.py
+                codePathLocal: push_to_wandb.py
+                email: arviziosoft@gmail.com
+                executable: C:\Users\afar1\AppData\Local\Programs\Python\Python312\python.exe
+                git:
+                    commit: 07e1fd117ad9b3641c0914b06b00fe0ddc570e94
+                    remote: https://github.com/dannycsa/fine_tunned_RAG.git
+                host: FerFisX
+                os: Windows-11-10.0.26200-SP0
+                program: C:\Users\afar1\OneDrive\Escritorio\fine_tunned_RAG\code\bedrock\push_to_wandb.py
+                python: CPython 3.12.3
+                root: C:\Users\afar1\OneDrive\Escritorio\fine_tunned_RAG\code\bedrock
+                startedAt: "2026-06-14T03:30:29.991840Z"
+                writerId: 9vmmi8elb3nen4vfioz4bfd7pdaw9beh
+        m:
+            - "1": train/step
+              "6":
+                - 3
+              "7": []
+            - "1": train/loss
+              "5": 1
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": eval/step
+              "6":
+                - 3
+              "7": []
+            - "1": eval/loss
+              "5": 3
+              "6":
+                - 1
+                - 3
+              "7": []
+        python_version: 3.12.3
+        t:
+            "3":
+                - 2
+                - 7
+                - 13
+                - 16
+            "4": 3.12.3
+            "5": 0.27.2
+            "8":
+                - 3
+            "12": 0.27.2
+            "13": windows-amd64
+base_model:
+    value: amazon.nova-micro-v1:0:128k
+epochs:
+    value: 3
+platform:
+    value: aws-bedrock

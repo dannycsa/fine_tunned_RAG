@@ -1,0 +1,3 @@
+arn:aws:bedrock:us-east-1:017161968115:model-customization-job/amazon.nova-micro-v1:0:128k/l01j01vhzwl4
+bedrock-ragtruth-ft-017161968115
+ragtruth-ft

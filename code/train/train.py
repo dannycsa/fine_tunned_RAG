@@ -88,17 +88,26 @@ args_entrenamiento = SFTConfig(
     output_dir="./resultados_ragtruth",
     per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
+    # FIX #4 (eval batch): el default de eval era 8. Con secuencias de longitud
+    # variable y >400 ejemplos de validación eso dispara memoria y, sin collator,
+    # rompe. Lo fijamos en 2 (suficiente para una eval estable y rápida).
+    per_device_eval_batch_size=2,
     num_train_epochs=3,
     learning_rate=2e-4,
     fp16=False,
     bf16=True,
     logging_steps=5,
     eval_strategy="steps",
-    eval_steps=200,
+    # FIX #4 (cadencia): con 800 muestras y batch efectivo 8 -> ~100 pasos/época,
+    # ~300 pasos en total. Evaluar/guardar "cada 200" daría 1 solo punto de
+    # eval_loss en W&B. Bajamos a 50 para obtener ~6 puntos y ver la curva real.
+    # (Si el dataset crece, sube este valor; W&B no necesita más cambios.)
+    eval_steps=50,
     save_strategy="steps",
-    save_steps=200,
+    save_steps=50,  # debe ser múltiplo de eval_steps por load_best_model_at_end
     load_best_model_at_end=True,
     metric_for_best_model="eval_loss",
+    greater_is_better=False,  # eval_loss: menor es mejor
     optim="paged_adamw_8bit",
     gradient_checkpointing=True,
     gradient_checkpointing_kwargs={"use_reentrant": False},
@@ -107,12 +116,20 @@ args_entrenamiento = SFTConfig(
     # dataset_text_field ya NO se pasa: el dataset ya está tokenizado
 )
 
+# FIX #3 (collator): el dataset ya viene tokenizado con longitudes variables.
+# Sin un collator que rellene (pad), el colador por defecto intenta apilar
+# tensores de distinto largo -> RuntimeError (sobre todo en la evaluación).
+# DataCollatorForLanguageModeling(mlm=False) rellena input_ids/attention_mask al
+# largo del lote y enmascara el padding en labels con -100 (no contamina la loss).
+data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+
 trainer = SFTTrainer(
     model=model,
     train_dataset=dataset_train,
     eval_dataset=dataset_val,
     peft_config=lora_config,
     args=args_entrenamiento,
+    data_collator=data_collator,
 )
 
 torch.cuda.empty_cache()
