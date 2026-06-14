@@ -17,6 +17,12 @@
 Ninguno usa RAG ni fine-tuning extra para esta evaluación: el cloud es **zero-shot**,
 el local es **el modelo ya fine-tuneado**. El contexto viene dado en cada instancia.
 
+> **Por qué Nova y no Claude:** el diagrama del equipo proponía Claude Haiku como
+> baseline cloud, pero en la cuenta AWS los modelos Claude están bloqueados como
+> *legacy* (no invocables) y no usamos API keys de Anthropic (todo debe correr en
+> AWS). Por eso el baseline cloud es **Amazon Nova Micro**, el modelo de texto más
+> liviano y comparable en tamaño a Gemma-2-2B. Declararlo así en el paper.
+
 ## 2. Test set y submuestra
 
 - Archivo único: **`grace_code/evaluacion_1200_es.jsonl`** (1.200 instancias ES, 50% alucina / 50% fiel).
@@ -114,6 +120,13 @@ Reportamos:
 - **Juez (LLM)**: `amazon.nova-pro-v1:0` (vía `ChatBedrockConverse`).
 - **Embeddings**: `amazon.titan-embed-text-v2:0`.
 - **Región**: `us-east-1`.
+- **⚠️ RAGAS se corre sobre un subset de 50 (no las 200), SERIAL (`--workers 1`).**
+  El juez Nova en Bedrock no devuelve el JSON estricto que RAGAS espera de forma
+  fiable a escala (errores `OUTPUT_PARSING_FAILURE` y timeouts); en serial sobre
+  ~50 instancias sí completa. Comando: `python score.py --preds <preds> --max-ragas 50 --workers 1`.
+  Grace debe usar **el mismo subset de 50** (mismo orden de `preds_*.jsonl`, mismo seed)
+  para que faithfulness/answer_relevancy sean comparables. Detección y eficiencia
+  SÍ se reportan sobre las 200.
 
 > Grace: tu scoring **también** llama a Bedrock para el juez y los embeddings
 > (necesitas credenciales AWS solo para esto; tu *inferencia* sigue siendo local).
@@ -163,3 +176,9 @@ python score.py --preds preds_local.jsonl
 3. **Solo 2 de las 4 métricas de RAGAS** se reportan (faithfulness + answer
    relevancy): Context Precision/Recall evalúan el *retriever*, y aquí no hay
    retrieval (el contexto viene dado), así que serían idénticas en ambos sistemas.
+4. **RAGAS sobre `ragas_n=50`** (no 200), por la fragilidad del juez Nova en JSON.
+   Reportar el `n` real en la Tabla 3. Detección/latencia/tokens van sobre las 200.
+5. **Answer Relevancy sale bajo (~0.20) por diseño:** el modelo emite un *veredicto*
+   ("VEREDICTO: SI…"), no una respuesta a la pregunta, así que RAGAS lo mide como
+   poco relevante a la query. Por eso el **Macro-F1 de detección es la métrica
+   principal** y RAGAS es secundaria.

@@ -25,6 +25,13 @@
     "total_input_tokens": 144451,
     "total_output_tokens": 11703,
     "total_tokens": 156154,
-    "avg_tokens_per_instance": 780.77
+    "avg_tokens_per_instance": 780.77,
+    "cost_total_usd": 0.006694,
+    "cost_per_1k_evals_usd": 0.0335
+  },
+  "ragas": {
+    "ragas_n": 50,
+    "faithfulness": 0.6327301587301587,
+    "answer_relevancy": 0.2041190426834108
   }
 }

@@ -82,19 +82,32 @@ def efficiency_metrics(rows, price_in, price_out):
 
 
 # ----------------------- RAGAS: faithfulness + answer relevancy ------------
-def ragas_metrics(rows, max_n):
+def ragas_metrics(rows, max_n, workers=3, timeout=300):
+    import boto3
+    from botocore.config import Config
     from ragas import evaluate, EvaluationDataset
     from ragas.metrics import Faithfulness, ResponseRelevancy
     from ragas.llms import LangchainLLMWrapper
     from ragas.embeddings import LangchainEmbeddingsWrapper
+    from ragas.run_config import RunConfig
     from langchain_aws import ChatBedrockConverse, BedrockEmbeddings
+
+    # Cliente Bedrock con reintentos adaptativos (anti-throttling).
+    bedrock_client = boto3.client(
+        "bedrock-runtime", region_name=C.AWS_REGION,
+        config=Config(retries={"max_attempts": 10, "mode": "adaptive"},
+                      read_timeout=120, connect_timeout=20))
 
     # ChatBedrockConverse usa la Converse API -> compatible con Amazon Nova.
     judge = LangchainLLMWrapper(ChatBedrockConverse(
-        model=C.RAGAS_JUDGE_MODEL, region_name=C.AWS_REGION,
+        model=C.RAGAS_JUDGE_MODEL, client=bedrock_client,
         temperature=0.0, max_tokens=1024))
     emb = LangchainEmbeddingsWrapper(BedrockEmbeddings(
-        model_id=C.RAGAS_EMBED_MODEL, region_name=C.AWS_REGION))
+        model_id=C.RAGAS_EMBED_MODEL, client=bedrock_client))
+
+    # Concurrencia baja + timeout alto + reintentos -> evita los TimeoutError.
+    run_config = RunConfig(timeout=timeout, max_retries=15, max_wait=90,
+                           max_workers=workers)
 
     sub = rows[:max_n] if max_n else rows
     # MAPEO (documentado en EVAL_SPEC.md):
@@ -109,7 +122,7 @@ def ragas_metrics(rows, max_n):
 
     ds = EvaluationDataset.from_list(samples)
     result = evaluate(ds, metrics=[Faithfulness(), ResponseRelevancy()],
-                      llm=judge, embeddings=emb)
+                      llm=judge, embeddings=emb, run_config=run_config)
     df = result.to_pandas()
     out = {"ragas_n": len(sub)}
     for col in df.columns:
@@ -128,6 +141,8 @@ def main():
                     help="USD/1k tokens entrada (0 para local)")
     ap.add_argument("--price-out", type=float, default=PRICE_OUT_NOVA_MICRO,
                     help="USD/1k tokens salida (0 para local)")
+    ap.add_argument("--workers", type=int, default=3, help="concurrencia RAGAS (bajo=estable)")
+    ap.add_argument("--timeout", type=int, default=300, help="timeout por job RAGAS (s)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
@@ -153,7 +168,7 @@ def main():
 
     if not args.no_ragas:
         print("\n===== RAGAS (faithfulness + answer relevancy) — usando Claude juez... =====")
-        results["ragas"] = ragas_metrics(rows, args.max_ragas)
+        results["ragas"] = ragas_metrics(rows, args.max_ragas, args.workers, args.timeout)
         for k, v in results["ragas"].items():
             print(f"  {k}: {round(v,3) if isinstance(v,float) else v}")
 
